@@ -1,0 +1,17 @@
+{
+  "name": "sqlin-life",
+  "version": "1.0.0",
+  "description": "Content management system for employee data",
+  "main": "server.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "node server.js"
+  },
+  "keywords": [],
+  "author": "Kat Gorecki",
+  "license": "ISC",
+  "dependencies": {
+    "mysql2": "^2.2.5",
+    "inquirer": "8.2.4"
+  }
+}
