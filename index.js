@@ -35,23 +35,26 @@ const mainMenu = async () => {
   });
 
   switch (choice) {
+
     case 'View all departments':
       db.query('SELECT * FROM department', function (err, results) {
         console.log(results);
       });
       break;
+
     case 'View all roles':
       db.query('SELECT * FROM role', function (err, results) {
         console.log(results);
       });
       break;
+
     case 'View all employees':
       db.query('SELECT * FROM employee', function (err, results) {
         console.log(results);
       });
       break;
+
     case 'Add a department':
-      // TODO:
       try {
         const answer = await inquirer.prompt({
         type: 'input',
@@ -64,6 +67,7 @@ const mainMenu = async () => {
       console.error('Error adding department: ', err.message);
     }
       break;
+
     case 'Add a role':
       // TODO:
       try {
@@ -92,12 +96,13 @@ const mainMenu = async () => {
         choices: departmentChoices
       }
     ]);
-      await db.query('INSERT INTO role (name, salary, department_id) VALUES (?)', (answers.roleName, answers.roleSalary, answers.dept.id));
+      await db.query('INSERT INTO role (title, salary, department_id) VALUES (?)', [answers.roleName, answers.roleSalary, answers.roleDepartment]);
       console.log(`${answers.roleName} added successfully!`);
     } catch (err) {
       console.error('Error adding role: ', err.message);
     }
       break;
+
     case 'Add an employee':
       // TODO:
       try {
@@ -107,7 +112,7 @@ const mainMenu = async () => {
           value: role.id
         }));
 
-        const [managers] = await db.query('SELECT id, first_name last_name FROM employee');
+        const [managers] = await db.query('SELECT id, first_name, last_name FROM employee');
   
         const managerOptions = managers.map(manager => ({
           name: `${manager.firstname} ${manager.lastname}`,
@@ -138,12 +143,13 @@ const mainMenu = async () => {
             choices: managerOptions
           }
         ]);
-        await db.query('INSERT INTO employee (first_name, last_name, role_id, manager_id) VALUES (?)', [answers.firstName, answers.lastName, answers.role.id, answers.manager.id]);
+        await db.query('INSERT INTO employee (first_name, last_name, role_id, manager_id) VALUES (?, ?, ?, ?)', [answers.firstName, answers.lastName, answers.employeeRole, answers.employeeManager]);
         console.log(`Employee, ${answers.firstName} ${answers.lastName}, added successfully!`);
       } catch (err) {
         console.error('Error adding employee: ', err.message);
       }
       break;
+
     case 'Update an employee role':
       // TODO:
       try {
@@ -173,7 +179,7 @@ const mainMenu = async () => {
             choices: roleOptions
           }
         ]);
-        await db.query('UPDATE employee SET role = ? WHERE id = ?', [answers.role.id, answers.employee.id]);
+        await db.query('UPDATE employee SET role_id = ? WHERE id = ?', [answers.updatedRole, answers.employees]);
         console.log(`${answers.employeeOptions.name}'s role to $${answers.roleOptions.title}, successfully!`);
       } catch (err) {
         console.error('Error updating employee: ', err.message);
