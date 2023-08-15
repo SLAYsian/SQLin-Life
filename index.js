@@ -18,7 +18,7 @@ const db = mysql.createConnection(
 
 // SECTION: Inquirer Prompts
 const mainMenu = async () => {
-  const { choice } = await inquirer.createPromptModule({
+  const { choice } = await inquirer.prompt({
     type: 'list',
     name: 'menu',
     message: 'What would you like to do?',
@@ -52,7 +52,7 @@ const mainMenu = async () => {
       break;
     // case 'Add a department':
     //   // TODO:
-      
+    //   db.
     //   break;
     // case 'Add a role':
     //   // TODO:
