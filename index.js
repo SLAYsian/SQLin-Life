@@ -38,24 +38,36 @@ const mainMenu = async () => {
     case 'View all departments':
       // console.log("About to query the database...");
       db.query('SELECT * FROM department', function (err, results) {
-        console.log("Inside the callback...");
+        // console.log("Inside the callback...");
         if (err) {
           console.error('Error selecting departments:', err.message);
           return;
         }
         console.table(results);
+        mainMenu();
       });
       break;
-
+     
     case 'View all roles':
-      db.query('SELECT * FROM role', function (err, results) {
-        console.log(results);
+      // db.query('SELECT * FROM role', function (err, results) { 
+        db.query('SELECT role.id, role.title, role.salary, department.name AS department_name FROM role INNER JOIN department ON role.department_id = department.id ORDER BY department.name', function (err, results) { 
+        if (err) {
+        console.error('Error selecting roles:', err.message);
+        return;
+      }
+        console.table(results);
+        mainMenu();
       });
       break;
 
     case 'View all employees':
-      db.query('SELECT * FROM employee', function (err, results) {
-        console.log(results);
+      db.query('SELECT e.id AS employee_id, e.first_name, e.last_name, r.title AS job_title, d.name AS department, r.salary, CONCAT(m.first_name, \' \', m.last_name) AS manager FROM employee e LEFT JOIN role r ON e.role_id = r.id LEFT JOIN department d ON r.department_id = d.id LEFT JOIN employee m ON e.manager_id = m.id ORDER BY department', function (err, results) {
+        if (err) {
+          console.error('Error selecting roles:', err.message);
+          return;
+        }
+        console.table(results);
+        mainMenu();
       });
       break;
 
@@ -77,7 +89,6 @@ const mainMenu = async () => {
       // TODO:
       try {
         const [departments] = db.query('SELECT id, name FROM department');
-
         const departmentChoices = departments.map(dept => ({
           name: dept.name,
           value: dept.id
