@@ -30,7 +30,7 @@ const mainMenu = async () => {
       'Add a role',
       'Add an employee',
       'Update an employee role',
-      'Exit'
+      'Quit'
     ]
   });
 
@@ -61,7 +61,7 @@ const mainMenu = async () => {
         name: 'addDepartment',
         message: 'What is the name of the department you would like to add?'
       });
-      await db.query('INSERT INTO department (name) VALUES (?)', [answer.addDepartment]);
+     db.query('INSERT INTO department (name) VALUES (?)', [answer.addDepartment]);
       console.log(`${answer.addDepartment} department added successfully!`);
     } catch (err) {
       console.error('Error adding department: ', err.message);
@@ -71,7 +71,7 @@ const mainMenu = async () => {
     case 'Add a role':
       // TODO:
       try {
-        const [departments] = await db.query('SELECT id, name FROM department');
+        const [departments] = db.query('SELECT id, name FROM department');
 
         const departmentChoices = departments.map(dept => ({
           name: dept.name,
@@ -96,7 +96,7 @@ const mainMenu = async () => {
         choices: departmentChoices
       }
     ]);
-      await db.query('INSERT INTO role (title, salary, department_id) VALUES (?)', [answers.roleName, answers.roleSalary, answers.roleDepartment]);
+      db.query('INSERT INTO role (title, salary, department_id) VALUES (?)', [answers.roleName, answers.roleSalary, answers.roleDepartment]);
       console.log(`${answers.roleName} added successfully!`);
     } catch (err) {
       console.error('Error adding role: ', err.message);
@@ -106,13 +106,13 @@ const mainMenu = async () => {
     case 'Add an employee':
       // TODO:
       try {
-        const [roles] = await db.query('SELECT id, title FROM role');
+        const [roles] = db.query('SELECT id, title FROM role');
         const roleOptions = roles.map(role => ({
           name: role.title,
           value: role.id
         }));
 
-        const [managers] = await db.query('SELECT id, first_name, last_name FROM employee');
+        const [managers] = db.query('SELECT id, first_name, last_name FROM employee');
   
         const managerOptions = managers.map(manager => ({
           name: `${manager.firstname} ${manager.lastname}`,
@@ -143,7 +143,7 @@ const mainMenu = async () => {
             choices: managerOptions
           }
         ]);
-        await db.query('INSERT INTO employee (first_name, last_name, role_id, manager_id) VALUES (?, ?, ?, ?)', [answers.firstName, answers.lastName, answers.employeeRole, answers.employeeManager]);
+        db.query('INSERT INTO employee (first_name, last_name, role_id, manager_id) VALUES (?, ?, ?, ?)', [answers.firstName, answers.lastName, answers.employeeRole, answers.employeeManager]);
         console.log(`Employee, ${answers.firstName} ${answers.lastName}, added successfully!`);
       } catch (err) {
         console.error('Error adding employee: ', err.message);
@@ -153,13 +153,13 @@ const mainMenu = async () => {
     case 'Update an employee role':
       // TODO:
       try {
-        const [employees] = await db.query('SELECT id, first_name last_name FROM employee');
+        const [employees] = db.query('SELECT id, first_name last_name FROM employee');
         const employeeOptions = employees.map(employee => ({
           name: `${employee.firstName} ${employee.lastName}`,
           value: employee.id
         }));
 
-        const [roles] = await db.query('SELECT id, title FROM role');
+        const [roles] = db.query('SELECT id, title FROM role');
         const roleOptions = roles.map(role => ({
           name: role.title,
           value: role.id
@@ -179,7 +179,7 @@ const mainMenu = async () => {
             choices: roleOptions
           }
         ]);
-        await db.query('UPDATE employee SET role_id = ? WHERE id = ?', [answers.updatedRole, answers.employees]);
+        db.query('UPDATE employee SET role_id = ? WHERE id = ?', [answers.updatedRole, answers.employees]);
         console.log(`${answers.employeeOptions.name}'s role to $${answers.roleOptions.title}, successfully!`);
       } catch (err) {
         console.error('Error updating employee: ', err.message);
