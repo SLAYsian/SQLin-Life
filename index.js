@@ -185,7 +185,7 @@ const mainMenu = async () => {
         console.error('Error updating employee: ', err.message);
       }
       break;
-    case 'Exit':
+    case 'Quit':
       db.end();
       return;
   }

@@ -15,11 +15,12 @@ CREATE TABLE role (
   id INT AUTO_INCREMENT PRIMARY KEY,
   title VARCHAR(30) NOT NULL,
   salary DECIMAL(10, 2) NOT NULL,
-  is_manager BOOLEAN,
+  -- is_manager BOOLEAN,
   department_id INT,
   -- NOTES: Reference department
   FOREIGN KEY (department_id) 
   REFERENCES department(id)
+  ON DELETE SET NULL
 
 );
 
@@ -32,7 +33,8 @@ CREATE TABLE employee (
  manager_id INT,
 --  NOTES: Reference role
 FOREIGN KEY (role_id) 
-REFERENCES role(id),
+REFERENCES role(id)
+ON DELETE SET NULL,
 -- NOTES: Reference manager
 FOREIGN KEY (manager_id)
 REFERENCES employee(id)
