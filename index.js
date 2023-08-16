@@ -4,7 +4,6 @@ const mysql = require('mysql2');
 // const Sequelize = require('sequelize');
 // require('dotenv').config();
 
-// const PORT = process.env.PORT || 3001;
 // SECTION: Connect to database
 const db = mysql.createConnection(
   {
@@ -18,9 +17,9 @@ const db = mysql.createConnection(
 
 // SECTION: Inquirer Prompts
 const mainMenu = async () => {
-  const { choice } = await inquirer.prompt({
+  const { action } = await inquirer.prompt({
     type: 'list',
-    name: 'menu',
+    name: 'action',
     message: 'What would you like to do?',
     choices: [
       'View all departments',
@@ -34,11 +33,17 @@ const mainMenu = async () => {
     ]
   });
 
-  switch (choice) {
-
+  switch (action) {
+   
     case 'View all departments':
+      // console.log("About to query the database...");
       db.query('SELECT * FROM department', function (err, results) {
-        console.log(results);
+        console.log("Inside the callback...");
+        if (err) {
+          console.error('Error selecting departments:', err.message);
+          return;
+        }
+        console.table(results);
       });
       break;
 
@@ -189,7 +194,7 @@ const mainMenu = async () => {
       db.end();
       return;
   }
-  mainMenu();
+  // mainMenu();
 };
 
 mainMenu();
