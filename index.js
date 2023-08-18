@@ -127,7 +127,6 @@ const mainMenu = async () => {
       break;
 
     case 'Add an employee':
-      // TODO:
         db.query('SELECT id, title FROM role', (err, roles) => {
           if (err) {
             console.error('Error fetching roles:', err.message);
@@ -185,38 +184,56 @@ const mainMenu = async () => {
       break;
     case 'Update an employee role':
       // TODO:
-      try {
-        const [employees] = db.query('SELECT id, first_name last_name FROM employee');
-        const employeeOptions = employees.map(employee => ({
-          name: `${employee.firstName} ${employee.lastName}`,
-          value: employee.id
-        }));
-
-        const [roles] = db.query('SELECT id, title FROM role');
-        const roleOptions = roles.map(role => ({
-          name: role.title,
-          value: role.id
-        }));
-  
-        const answers = await inquirer.prompt([
-          {
-            type: 'list',
-            name: 'employees',
-            message: 'Which employee\'s role would you like to update?',
-            choices: employeeOptions
-          },
-          {
-            type: 'list',
-            name: 'updatedRole',
-            message: 'Which role would you like to assign to the selected employee?',
-            choices: roleOptions
+      // try {
+      //   const [employees] = db.query('SELECT id, first_name last_name FROM employee');
+        db.query('SELECT id, first_name, last_name FROM employee', (err, employees) => {
+          if (err) {
+            console.error('Error fetching employees:', err.message);
+            return;
           }
-        ]);
-        db.query('UPDATE employee SET role_id = ? WHERE id = ?', [answers.updatedRole, answers.employees]);
-        console.log(`${answers.employeeOptions.name}'s role to $${answers.roleOptions.title}, successfully!`);
-      } catch (err) {
-        console.error('Error updating employee: ', err.message);
-      }
+          const employeeOptions = employees.map(employee => ({
+            name: `${employee.first_name} ${employee.last_name}`,
+            value: employee.id
+          }));
+          db.query('SELECT id, title FROM role', (err, roles) => {
+            if (err) {
+              console.error('Error fetching roles:', err.message);
+              return;
+            }
+            const roleOptions = roles.map(role => ({
+              name: role.title,
+              value: role.id
+            }));
+            inquirer.prompt([
+              {
+                type: 'list',
+                name: 'employees',
+                message: 'Which employee\'s role would you like to update?',
+                choices: employeeOptions
+              },
+              {
+                type: 'list',
+                name: 'updatedRole',
+                message: 'Which role would you like to assign to the selected employee?',
+                choices: roleOptions
+              }
+            ]).then(answers => {
+              db.query('UPDATE employee SET role_id = ? WHERE id = ?', [answers.updatedRole, answers.employees], (err, results) => {
+                if (err) {
+                  console.error('Error updating employee:', err.message);
+                  return;
+                }
+                const selectedEmployee = employeeOptions.find(emp => emp.value === answers.employees);
+const selectedRole = roleOptions.find(role => role.value === answers.updatedRole);
+
+console.log(`Updated ${selectedEmployee.name}'s role to ${selectedRole.name}, successfully!`);
+                mainMenu();
+              });
+            });
+          });
+        });
+        // const [roles] = db.query('SELECT id, title FROM role')
+        // const answers = await inquirer.prompt([
       break;
     case 'Quit':
       db.end();

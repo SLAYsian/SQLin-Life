@@ -19,3 +19,10 @@ ON r.department_id = d.id
 LEFT JOIN employee m
 ON e.manager_id = m.id
 ORDER BY department;
+
+SELECT employee.id, employee.first_name, role.salary, department.name AS department_name
+FROM role
+INNER JOIN department 
+ON role.department_id = department.id
+ORDER BY department_name;
+
