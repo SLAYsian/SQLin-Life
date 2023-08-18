@@ -1,8 +1,8 @@
-  SELECT role.id, role.title, role.salary, department.name AS department_name
-  FROM role
-  INNER JOIN department 
-  ON role.department_id = department.id
-  ORDER BY department_name;
+SELECT role.id, role.title, role.salary, department.name AS department_name
+FROM role
+INNER JOIN department 
+ON role.department_id = department.id
+ORDER BY department_name;
 
 SELECT 
 e.id AS employee_id, 

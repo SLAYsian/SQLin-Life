@@ -83,7 +83,6 @@ const mainMenu = async () => {
       break;
 
     case 'Add a role':
-      // TODO:
       try {
         db.query('SELECT id, name FROM department', (err, departments) => {
           if (err) {
@@ -129,21 +128,26 @@ const mainMenu = async () => {
 
     case 'Add an employee':
       // TODO:
-      try {
-        const [roles] = db.query('SELECT id, title FROM role');
-        const roleOptions = roles.map(role => ({
-          name: role.title,
-          value: role.id
+        db.query('SELECT id, title FROM role', (err, roles) => {
+          if (err) {
+            console.error('Error fetching roles:', err.message);
+            return;
+          }
+          const roleOptions = roles.map(role => ({
+            name: role.title,
+            value: role.id
+          }));
+        db.query('SELECT id, first_name, last_name FROM employee', (err, managers) => {
+          if (err) {
+            console.error('Error fetching managers:', err.message);
+            return;
+          }
+          const managerOptions = managers.map(manager => ({
+            name: `${manager.first_name} ${manager.last_name}`,
+            value: manager.id
         }));
-
-        const [managers] = db.query('SELECT id, first_name, last_name FROM employee');
-  
-        const managerOptions = managers.map(manager => ({
-          name: `${manager.firstname} ${manager.lastname}`,
-          value: manager.id
-        }));
-  
-        const answers = await inquirer.prompt([
+        managerOptions.push({ name: 'None', value: null });
+        inquirer.prompt([
           {
             type: 'input',
             name: 'firstName',
@@ -163,17 +167,22 @@ const mainMenu = async () => {
           {
             type: 'list',
             name: 'employeeManager',
-            message: 'Who is the emploayee\s manager?',
+            message: 'Who is the employee\'s manager?',
             choices: managerOptions
           }
-        ]);
-        db.query('INSERT INTO employee (first_name, last_name, role_id, manager_id) VALUES (?, ?, ?, ?)', [answers.firstName, answers.lastName, answers.employeeRole, answers.employeeManager]);
-        console.log(`Employee, ${answers.firstName} ${answers.lastName}, added successfully!`);
-      } catch (err) {
-        console.error('Error adding employee: ', err.message);
-      }
+        ]).then(answers => {
+        db.query('INSERT INTO employee (first_name, last_name, role_id, manager_id) VALUES (?, ?, ?, ?)', [answers.firstName, answers.lastName, answers.employeeRole, answers.employeeManager], (err, result) => {
+          if (err) {
+            console.error('Error adding employee:', err.message);
+            return;
+          }
+          console.log(`Employee, ${answers.firstName} ${answers.lastName}, added successfully!`);
+          mainMenu();
+        });
+      });
+    });
+  });
       break;
-
     case 'Update an employee role':
       // TODO:
       try {
