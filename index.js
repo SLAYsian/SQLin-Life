@@ -36,9 +36,7 @@ const mainMenu = async () => {
   switch (action) {
    
     case 'View all departments':
-      // console.log("About to query the database...");
       db.query('SELECT * FROM department', function (err, results) {
-        // console.log("Inside the callback...");
         if (err) {
           console.error('Error selecting departments:', err.message);
           return;
@@ -49,7 +47,6 @@ const mainMenu = async () => {
       break;
      
     case 'View all roles':
-      // db.query('SELECT * FROM role', function (err, results) { 
         db.query('SELECT role.id, role.title, role.salary, department.name AS department_name FROM role INNER JOIN department ON role.department_id = department.id ORDER BY department.name', function (err, results) { 
         if (err) {
         console.error('Error selecting roles:', err.message);
@@ -79,44 +76,55 @@ const mainMenu = async () => {
         message: 'What is the name of the department you would like to add?'
       });
      db.query('INSERT INTO department (name) VALUES (?)', [answer.addDepartment]);
-      console.log(`${answer.addDepartment} department added successfully!`);
+      console.log(`${answer.addDepartment} department added successfully to the database!`);
     } catch (err) {
       console.error('Error adding department: ', err.message);
-    }
+    }   mainMenu();
       break;
 
     case 'Add a role':
       // TODO:
       try {
-        const [departments] = db.query('SELECT id, name FROM department');
-        const departmentChoices = departments.map(dept => ({
-          name: dept.name,
-          value: dept.id
-      }));
-
-        const answers = await inquirer.prompt([
-          {
-        type: 'input',
-        name: 'roleName',
-        message: 'What is the name of the role you would like to add?'
-      },
-      {
-        type: 'input',
-        name: 'roleSalary',
-        message: 'What is the salary of the role?'
-      },
-      {
-        type: 'list',
-        name: 'roleDepartment',
-        message: 'Which department does the role belong to?',
-        choices: departmentChoices
-      }
-    ]);
-      db.query('INSERT INTO role (title, salary, department_id) VALUES (?)', [answers.roleName, answers.roleSalary, answers.roleDepartment]);
-      console.log(`${answers.roleName} added successfully!`);
+        db.query('SELECT id, name FROM department', (err, departments) => {
+          if (err) {
+            console.error('Error fetching departments: ', err.message);
+            return
+          }
+          const departmentChoices = departments.map(dept => ({
+            name: dept.name,
+            value: dept.id
+          }));
+          inquirer.prompt([
+            {
+              type: 'input',
+              name: 'roleName',
+              message: 'What is the name of the role you would like to add?'
+            },
+            {
+              type: 'input',
+              name: 'roleSalary',
+              message: 'What is the salary of the role?'
+            },
+            {
+              type: 'list',
+              name: 'roleDepartment',
+              message: 'Which department does the role belong to?',
+              choices: departmentChoices
+            }
+          ]).then(answers => {
+            db.query('INSERT INTO role (title, salary, department_id) VALUES (?, ?, ?)', [answers.roleName, answers.roleSalary, answers.roleDepartment], (err, result) => {
+              if (err) {
+                console.error('Error adding role:', err.message);
+                return;
+              }
+              console.log(`${answers.roleName} added successfully!`);
+              mainMenu();
+            });
+          });
+        });
     } catch (err) {
-      console.error('Error adding role: ', err.message);
-    }
+      console.error('Error: ', err.message);
+    } 
       break;
 
     case 'Add an employee':
