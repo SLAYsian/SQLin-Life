@@ -17,6 +17,7 @@
   6. [Questions](#questions)
 
 > ## USAGE
+https://github.com/SLAYsian/SQLin-Life/assets/127693250/1a33d6c3-c4f7-4784-a16b-4b2db8a4983f
 #### Install all npm packages<br/>
 #### Update your username and password for MySQL<br/>
 #### Run the db/schema.sql file<br/>
