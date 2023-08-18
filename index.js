@@ -29,6 +29,7 @@ const mainMenu = async () => {
       'Add a role',
       'Add an employee',
       'Update an employee role',
+      'Update an employee manager',
       'Quit'
     ]
   });
@@ -183,9 +184,6 @@ const mainMenu = async () => {
   });
       break;
     case 'Update an employee role':
-      // TODO:
-      // try {
-      //   const [employees] = db.query('SELECT id, first_name last_name FROM employee');
         db.query('SELECT id, first_name, last_name FROM employee', (err, employees) => {
           if (err) {
             console.error('Error fetching employees:', err.message);
@@ -232,14 +230,60 @@ console.log(`Updated ${selectedEmployee.name}'s role to ${selectedRole.name}, su
             });
           });
         });
-        // const [roles] = db.query('SELECT id, title FROM role')
-        // const answers = await inquirer.prompt([
+      break;
+      case 'Update an employee manager':
+        db.query('SELECT id, first_name, last_name FROM employee', (err, employees) => {
+          if (err) {
+            console.error('Error fetching employees:', err.message);
+            return;
+          }
+          const employeeOptions = employees.map(employee => ({
+            name: `${employee.first_name} ${employee.last_name}`,
+            value: employee.id
+          }));
+          db.query('SELECT id, first_name, last_name FROM employee', (err, managers) => {
+            if (err) {
+              console.error('Error fetching managers:', err.message);
+              return;
+            }
+            const managerOptions = managers.map(manager => ({
+              name: `${manager.first_name} ${manager.last_name}`,
+              value: manager.id
+          }));
+          managerOptions.push({ name: 'None', value: null });
+            inquirer.prompt([
+              {
+                type: 'list',
+                name: 'employees',
+                message: 'Which employee would you like to update?',
+                choices: employeeOptions
+              },
+              {
+                type: 'list',
+                name: 'updatedManager',
+                message: 'Which manager would you like to assign to the selected employee?',
+                choices: managerOptions
+              }
+            ]).then(answers => {
+              db.query('UPDATE employee SET manager_id = ? WHERE id = ?', [answers.updatedManager, answers.employees], (err, results) => {
+                if (err) {
+                  console.error('Error updating employee manager:', err.message);
+                  return;
+                }
+                const selectedEmployee = employeeOptions.find(emp => emp.value === answers.employees);
+const selectedManager = managerOptions.find(manager => manager.value === answers.updatedManager);
+
+console.log(`Updated ${selectedEmployee.name}'s manager to ${selectedManager.name}, successfully!`);
+                mainMenu();
+              });
+            });
+          });
+        });
       break;
     case 'Quit':
       db.end();
       return;
   }
-  // mainMenu();
 };
 
 mainMenu();
