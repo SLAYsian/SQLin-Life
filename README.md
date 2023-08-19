@@ -42,3 +42,6 @@ Please see the LICENSE file for details
 - Commit changes to your own branch
 - Push your work back up to your fork
 - Submit a pull request for review
+
+> ## QUESTIONS
+For any questions, please reach out to me via GitHub (https://github.com/SLAYsian).
